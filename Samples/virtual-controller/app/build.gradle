@@ -1,0 +1,53 @@
+apply plugin: 'com.android.application'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.1.2'
+    }
+}
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion '23.0.3'
+    signingConfigs {
+        debug {
+            storeFile file("../../sample.keystore")
+            storePassword "password"
+            keyAlias "controller"
+            keyPassword "password"
+        }
+    }
+    defaultConfig {
+        applicationId "tv.ouya.examples.android.virtualcontroller"
+        minSdkVersion 19
+        targetSdkVersion 21
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+    productFlavors {
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:18.0.0'
+    compile(name: 'store-sdk-standard-release', ext: 'aar')
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+}
