@@ -1,0 +1,57 @@
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.1.2'
+    }
+}
+
+apply plugin: 'com.android.application'
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion '23.0.3'
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+        }
+    }
+    signingConfigs {
+        debug {
+            storeFile file("../sample.keystore")
+            storePassword "password"
+            keyAlias "controller"
+            keyPassword "password"
+        }
+    }
+    defaultConfig {
+        targetSdkVersion 23
+        minSdkVersion 19
+
+        versionName '1.0'
+        versionCode 1
+
+        applicationId 'tv.ouya.controllertest'
+    }
+    lintOptions {
+        abortOnError false
+    }
+    productFlavors {
+    }
+}
+
+dependencies {
+    compile(name: 'store-sdk-standard-release', ext: 'aar')
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+}

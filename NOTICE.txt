@@ -1,0 +1,3 @@
+Razer Software Development Kit
+Copyright 2012-2016 Razer, Inc.
+This product includes software developed by Razer, Inc. (http://www.razerzone.com/).
