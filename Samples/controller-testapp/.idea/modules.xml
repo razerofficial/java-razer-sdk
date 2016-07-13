@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ouya-controller-testapp.iml" filepath="$PROJECT_DIR$/ouya-controller-testapp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/controller-testapp.iml" filepath="$PROJECT_DIR$/controller-testapp.iml" />
     </modules>
   </component>
 </project>
