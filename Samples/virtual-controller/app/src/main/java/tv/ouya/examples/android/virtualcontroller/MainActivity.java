@@ -1,6 +1,5 @@
 package tv.ouya.examples.android.virtualcontroller;
 
-import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,8 +19,6 @@ import com.razerzone.store.sdk.Controller;
 import com.razerzone.store.sdk.InputMapper;
 import com.razerzone.store.sdk.StoreFacade;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.security.InvalidParameterException;
 import java.util.HashMap;
 
@@ -50,50 +47,50 @@ public class MainActivity extends BaseActivity {
 	
 	private static final Float AXIS_SCALER = 4f;
 	
-	private TextView txtSystem = null;
-	private TextView txtController = null;
-	private TextView txtKeyCode = null;
-	private TextView txtKeyCode2 = null;
-	private ImageView imgControllerO = null;
-	private ImageView imgControllerU = null;
-	private ImageView imgControllerY = null;
-	private ImageView imgControllerA = null;
-	private ImageView imgControllerL1 = null;
-	private ImageView imgControllerL2 = null;
-	private ImageView imgControllerL3 = null;
-	private ImageView imgControllerR1 = null;
-	private ImageView imgControllerR2 = null;
-	private ImageView imgControllerR3 = null;
-	private ImageView imgControllerDpad = null;
-	private ImageView imgControllerDpadDown = null;
-	private ImageView imgControllerDpadLeft = null;
-	private ImageView imgControllerDpadRight = null;
-	private ImageView imgControllerDpadUp = null;
-	private ImageView imgControllerBack = null;
-	private ImageView imgControllerHome = null;
-	private ImageView imgControllerMenu = null;
-	private ImageView imgControllerNext = null;
-	private ImageView imgControllerPower = null;
-	private ImageView imgControllerPrevious = null;
-	private ImageView imgControllerLS = null;
-	private ImageView imgControllerRS = null;
-	private ImageView imgButtonMenu = null;	
-	private ImageView imgButtonA = null;
-	private ImageView imgDpadDown = null;
-	private ImageView imgDpadLeft = null;
-	private ImageView imgDpadRight = null;
-	private ImageView imgDpadUp = null;
-	private ImageView imgLeftStick = null;
-	private ImageView imgLeftBumper = null;
-	private ImageView imgLeftTrigger = null;
-	private ImageView imgButtonO = null;
-	private ImageView imgRightStick = null;
-	private ImageView imgRightBumper = null;
-	private ImageView imgRightTrigger = null;
-	private ImageView imgLeftThumb = null;
-	private ImageView imgRightThumb = null;
-	private ImageView imgButtonU = null;
-	private ImageView imgButtonY = null;
+	private TextView mTxtSystem = null;
+	private TextView mTxtController = null;
+	private TextView mTxtKeyCode = null;
+	private TextView mTxtKeyCode2 = null;
+	private ImageView mImgControllerO = null;
+	private ImageView mImgControllerU = null;
+	private ImageView mImgControllerY = null;
+	private ImageView mImgControllerA = null;
+	private ImageView mImgControllerL1 = null;
+	private ImageView mImgControllerL2 = null;
+	private ImageView mImgControllerL3 = null;
+	private ImageView mImgControllerR1 = null;
+	private ImageView mImgControllerR2 = null;
+	private ImageView mImgControllerR3 = null;
+	private ImageView mImgControllerDpad = null;
+	private ImageView mImgControllerDpadDown = null;
+	private ImageView mImgControllerDpadLeft = null;
+	private ImageView mImgControllerDpadRight = null;
+	private ImageView mImgControllerDpadUp = null;
+	private ImageView mImgControllerBack = null;
+	private ImageView mImgControllerHome = null;
+	private ImageView mImgControllerMenu = null;
+	private ImageView mImgControllerNext = null;
+	private ImageView mImgControllerPower = null;
+	private ImageView mImgControllerPrevious = null;
+	private ImageView mImgControllerLS = null;
+	private ImageView mImgControllerRS = null;
+	private ImageView mImgButtonMenu = null;
+	private ImageView mImgButtonA = null;
+	private ImageView mImgDpadDown = null;
+	private ImageView mImgDpadLeft = null;
+	private ImageView mImgDpadRight = null;
+	private ImageView mImgDpadUp = null;
+	private ImageView mImgLeftStick = null;
+	private ImageView mImgLeftBumper = null;
+	private ImageView mImgLeftTrigger = null;
+	private ImageView mImgButtonO = null;
+	private ImageView mImgRightStick = null;
+	private ImageView mImgRightBumper = null;
+	private ImageView mImgRightTrigger = null;
+	private ImageView mImgLeftThumb = null;
+	private ImageView mImgRightThumb = null;
+	private ImageView mImgButtonU = null;
+	private ImageView mImgButtonY = null;
 	
 	// keep track when menu button was seen
 	private Boolean mWaitToExit = true;
@@ -141,50 +138,50 @@ public class MainActivity extends BaseActivity {
 		
 		mStoreFacade.init(this, developerInfo);
 		
-		txtSystem = (TextView)findViewById(R.id.txtSystem);
-		txtController = (TextView)findViewById(R.id.txtController);
-		imgButtonMenu = (ImageView)findViewById(R.id.imgButtonMenu);
-		txtKeyCode = (TextView)findViewById(R.id.txtKeyCode);
-		txtKeyCode2 = (TextView)findViewById(R.id.txtKeyCode2);
-		imgControllerO = (ImageView)findViewById(R.id.imgControllerO);
-		imgControllerU = (ImageView)findViewById(R.id.imgControllerU);
-		imgControllerY = (ImageView)findViewById(R.id.imgControllerY);
-		imgControllerA = (ImageView)findViewById(R.id.imgControllerA);
-		imgControllerL1 = (ImageView)findViewById(R.id.imgControllerL1);
-		imgControllerL2 = (ImageView)findViewById(R.id.imgControllerL2);
-		imgControllerL3 = (ImageView)findViewById(R.id.imgControllerl3);
-		imgControllerR1 = (ImageView)findViewById(R.id.imgControllerR1);
-		imgControllerR2 = (ImageView)findViewById(R.id.imgControllerR2);
-		imgControllerR3 = (ImageView)findViewById(R.id.imgControllerR3);
-		imgControllerDpad = (ImageView)findViewById(R.id.imgControllerDpad);
-		imgControllerDpadDown = (ImageView)findViewById(R.id.imgControllerDpadDown);
-		imgControllerDpadLeft = (ImageView)findViewById(R.id.imgControllerDpadLeft);
-		imgControllerDpadRight = (ImageView)findViewById(R.id.imgControllerDpadRight);
-		imgControllerDpadUp = (ImageView)findViewById(R.id.imgControllerDpadUp);
-		imgControllerBack = (ImageView)findViewById(R.id.imgControllerBack);
-		imgControllerHome = (ImageView)findViewById(R.id.imgControllerHome);
-		imgControllerMenu = (ImageView)findViewById(R.id.imgControllerMenu);
-		imgControllerNext = (ImageView)findViewById(R.id.imgControllerNext);
-		imgControllerPrevious = (ImageView)findViewById(R.id.imgControllerPrevious);
-		imgControllerPower = (ImageView)findViewById(R.id.imgControllerPower);
-		imgControllerLS = (ImageView)findViewById(R.id.imgControllerLS);
-		imgControllerRS = (ImageView)findViewById(R.id.imgControllerRS);
-		imgButtonA = (ImageView)findViewById(R.id.imgButtonA);
-		imgDpadDown = (ImageView)findViewById(R.id.imgDpadDown);
-		imgDpadLeft = (ImageView)findViewById(R.id.imgDpadLeft);
-		imgDpadRight = (ImageView)findViewById(R.id.imgDpadRight);
-		imgDpadUp = (ImageView)findViewById(R.id.imgDpadUp);
-		imgLeftStick = (ImageView)findViewById(R.id.imgLeftStick);
-		imgLeftBumper = (ImageView)findViewById(R.id.imgLeftBumper);
-		imgLeftTrigger = (ImageView)findViewById(R.id.imgLeftTrigger);
-		imgButtonO = (ImageView)findViewById(R.id.imgButtonO);
-		imgRightStick = (ImageView)findViewById(R.id.imgRightStick);
-		imgRightBumper = (ImageView)findViewById(R.id.imgRightBumper);
-		imgRightTrigger = (ImageView)findViewById(R.id.imgRightTrigger);
-		imgLeftThumb = (ImageView)findViewById(R.id.imgLeftThumb);
-		imgRightThumb = (ImageView)findViewById(R.id.imgRightThumb);
-		imgButtonU = (ImageView)findViewById(R.id.imgButtonU);
-		imgButtonY = (ImageView)findViewById(R.id.imgButtonY);
+		mTxtSystem = (TextView)findViewById(R.id.txtSystem);
+		mTxtController = (TextView)findViewById(R.id.txtController);
+		mImgButtonMenu = (ImageView)findViewById(R.id.imgButtonMenu);
+		mTxtKeyCode = (TextView)findViewById(R.id.txtKeyCode);
+		mTxtKeyCode2 = (TextView)findViewById(R.id.txtKeyCode2);
+		mImgControllerO = (ImageView)findViewById(R.id.imgControllerO);
+		mImgControllerU = (ImageView)findViewById(R.id.imgControllerU);
+		mImgControllerY = (ImageView)findViewById(R.id.imgControllerY);
+		mImgControllerA = (ImageView)findViewById(R.id.imgControllerA);
+		mImgControllerL1 = (ImageView)findViewById(R.id.imgControllerL1);
+		mImgControllerL2 = (ImageView)findViewById(R.id.imgControllerL2);
+		mImgControllerL3 = (ImageView)findViewById(R.id.imgControllerl3);
+		mImgControllerR1 = (ImageView)findViewById(R.id.imgControllerR1);
+		mImgControllerR2 = (ImageView)findViewById(R.id.imgControllerR2);
+		mImgControllerR3 = (ImageView)findViewById(R.id.imgControllerR3);
+		mImgControllerDpad = (ImageView)findViewById(R.id.imgControllerDpad);
+		mImgControllerDpadDown = (ImageView)findViewById(R.id.imgControllerDpadDown);
+		mImgControllerDpadLeft = (ImageView)findViewById(R.id.imgControllerDpadLeft);
+		mImgControllerDpadRight = (ImageView)findViewById(R.id.imgControllerDpadRight);
+		mImgControllerDpadUp = (ImageView)findViewById(R.id.imgControllerDpadUp);
+		mImgControllerBack = (ImageView)findViewById(R.id.imgControllerBack);
+		mImgControllerHome = (ImageView)findViewById(R.id.imgControllerHome);
+		mImgControllerMenu = (ImageView)findViewById(R.id.imgControllerMenu);
+		mImgControllerNext = (ImageView)findViewById(R.id.imgControllerNext);
+		mImgControllerPrevious = (ImageView)findViewById(R.id.imgControllerPrevious);
+		mImgControllerPower = (ImageView)findViewById(R.id.imgControllerPower);
+		mImgControllerLS = (ImageView)findViewById(R.id.imgControllerLS);
+		mImgControllerRS = (ImageView)findViewById(R.id.imgControllerRS);
+		mImgButtonA = (ImageView)findViewById(R.id.imgButtonA);
+		mImgDpadDown = (ImageView)findViewById(R.id.imgDpadDown);
+		mImgDpadLeft = (ImageView)findViewById(R.id.imgDpadLeft);
+		mImgDpadRight = (ImageView)findViewById(R.id.imgDpadRight);
+		mImgDpadUp = (ImageView)findViewById(R.id.imgDpadUp);
+		mImgLeftStick = (ImageView)findViewById(R.id.imgLeftStick);
+		mImgLeftBumper = (ImageView)findViewById(R.id.imgLeftBumper);
+		mImgLeftTrigger = (ImageView)findViewById(R.id.imgLeftTrigger);
+		mImgButtonO = (ImageView)findViewById(R.id.imgButtonO);
+		mImgRightStick = (ImageView)findViewById(R.id.imgRightStick);
+		mImgRightBumper = (ImageView)findViewById(R.id.imgRightBumper);
+		mImgRightTrigger = (ImageView)findViewById(R.id.imgRightTrigger);
+		mImgLeftThumb = (ImageView)findViewById(R.id.imgLeftThumb);
+		mImgRightThumb = (ImageView)findViewById(R.id.imgRightThumb);
+		mImgButtonU = (ImageView)findViewById(R.id.imgButtonU);
+		mImgButtonY = (ImageView)findViewById(R.id.imgButtonY);
 		
         InputMapper.setEnableControllerDispatch(true);
 
@@ -203,7 +200,7 @@ public class MainActivity extends BaseActivity {
 	        			{
 		        			public void run()
 		        			{
-		        				imgButtonMenu.setVisibility(View.INVISIBLE);
+		        				mImgButtonMenu.setVisibility(View.INVISIBLE);
 		        			}
 	        			};
 	        			runOnUiThread(runnable);
@@ -225,33 +222,33 @@ public class MainActivity extends BaseActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		txtSystem.setText("Brand=" + android.os.Build.BRAND + " Model=" + android.os.Build.MODEL + " Device=" + Build.DEVICE +
+		mTxtSystem.setText("Brand=" + android.os.Build.BRAND + " Model=" + android.os.Build.MODEL + " Device=" + Build.DEVICE +
 				" Version=" + android.os.Build.VERSION.SDK_INT +
 				" isRunningOnSupportedHardware="+mStoreFacade.isRunningOnSupportedHardware());
 		
-		setDrawable(imgControllerO, Controller.BUTTON_O);
-		setDrawable(imgControllerU, Controller.BUTTON_U);
-		setDrawable(imgControllerY, Controller.BUTTON_Y);
-		setDrawable(imgControllerA, Controller.BUTTON_A);
-		setDrawable(imgControllerL1, Controller.BUTTON_L1);
-		setDrawable(imgControllerL2, KeyEvent.KEYCODE_BUTTON_L2);
-		setDrawable(imgControllerL3, Controller.BUTTON_L3);
-		setDrawable(imgControllerR1, Controller.BUTTON_R1);
-		setDrawable(imgControllerR2, KeyEvent.KEYCODE_BUTTON_R2);
-		setDrawable(imgControllerR3, Controller.BUTTON_R3);
-		setDrawable(imgControllerDpad, Controller.BUTTON_DPAD);
-		setDrawable(imgControllerDpadDown, Controller.BUTTON_DPAD_DOWN);
-		setDrawable(imgControllerDpadLeft, Controller.BUTTON_DPAD_LEFT);
-		setDrawable(imgControllerDpadRight, Controller.BUTTON_DPAD_RIGHT);
-		setDrawable(imgControllerDpadUp, Controller.BUTTON_DPAD_UP);
-		setDrawable(imgControllerBack, KeyEvent.KEYCODE_BACK);
-		setDrawable(imgControllerHome, Controller.BUTTON_HOME);
-		setDrawable(imgControllerMenu, Controller.BUTTON_MENU);
-		setDrawable(imgControllerNext, KeyEvent.KEYCODE_BUTTON_START);
-		setDrawable(imgControllerPower, KeyEvent.KEYCODE_BUTTON_MODE);
-		setDrawable(imgControllerPrevious, KeyEvent.KEYCODE_BUTTON_SELECT);
-		setDrawable(imgControllerLS, Controller.AXIS_LS_X);
-		setDrawable(imgControllerRS, Controller.AXIS_RS_X);
+		setDrawable(mImgControllerO, Controller.BUTTON_O);
+		setDrawable(mImgControllerU, Controller.BUTTON_U);
+		setDrawable(mImgControllerY, Controller.BUTTON_Y);
+		setDrawable(mImgControllerA, Controller.BUTTON_A);
+		setDrawable(mImgControllerL1, Controller.BUTTON_L1);
+		setDrawable(mImgControllerL2, KeyEvent.KEYCODE_BUTTON_L2);
+		setDrawable(mImgControllerL3, Controller.BUTTON_L3);
+		setDrawable(mImgControllerR1, Controller.BUTTON_R1);
+		setDrawable(mImgControllerR2, KeyEvent.KEYCODE_BUTTON_R2);
+		setDrawable(mImgControllerR3, Controller.BUTTON_R3);
+		setDrawable(mImgControllerDpad, Controller.BUTTON_DPAD);
+		setDrawable(mImgControllerDpadDown, Controller.BUTTON_DPAD_DOWN);
+		setDrawable(mImgControllerDpadLeft, Controller.BUTTON_DPAD_LEFT);
+		setDrawable(mImgControllerDpadRight, Controller.BUTTON_DPAD_RIGHT);
+		setDrawable(mImgControllerDpadUp, Controller.BUTTON_DPAD_UP);
+		setDrawable(mImgControllerBack, KeyEvent.KEYCODE_BACK);
+		setDrawable(mImgControllerHome, Controller.BUTTON_HOME);
+		setDrawable(mImgControllerMenu, Controller.BUTTON_MENU);
+		setDrawable(mImgControllerNext, KeyEvent.KEYCODE_BUTTON_START);
+		setDrawable(mImgControllerPower, KeyEvent.KEYCODE_BUTTON_MODE);
+		setDrawable(mImgControllerPrevious, KeyEvent.KEYCODE_BUTTON_SELECT);
+		setDrawable(mImgControllerLS, Controller.AXIS_LS_X);
+		setDrawable(mImgControllerRS, Controller.AXIS_RS_X);
 	}
 	
 	@Override
@@ -273,8 +270,8 @@ public class MainActivity extends BaseActivity {
 	
 	private OnClickListener mClickListener = new OnClickListener() {
 	    public void onClick(View v) {
-	    	txtKeyCode.setText("Click detected");
-	    	txtController.setText("");
+	    	mTxtKeyCode.setText("Click detected");
+	    	mTxtController.setText("");
 	    }
 	};
 	
@@ -301,10 +298,10 @@ public class MainActivity extends BaseActivity {
 	
 	@Override
 	public boolean dispatchGenericMotionEvent(MotionEvent motionEvent) {
-		if (null != txtKeyCode) {
+		if (null != mTxtKeyCode) {
 			InputDevice device = motionEvent.getDevice();
 			if (null != device) {
-				txtKeyCode.setText("Original MotionEvent device=" + device.getName());
+				mTxtKeyCode.setText("Original MotionEvent device=" + device.getName());
 			}
 		}
 		//DebugInput.debugMotionEvent(motionEvent);		
@@ -314,10 +311,10 @@ public class MainActivity extends BaseActivity {
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent keyEvent) {
 		//Log.i(TAG, "dispatchKeyEvent");
-		if (null != txtKeyCode) {
+		if (null != mTxtKeyCode) {
 			InputDevice device = keyEvent.getDevice();
 			if (null != device) {
-				txtKeyCode.setText("Original KeyEvent device=" + device.getName() + " KeyCode=(" + keyEvent.getKeyCode() + ") "
+				mTxtKeyCode.setText("Original KeyEvent device=" + device.getName() + " KeyCode=(" + keyEvent.getKeyCode() + ") "
 						+ DebugInput.debugGetButtonName(keyEvent.getKeyCode())+" source="+keyEvent.getSource());
 			}
 		}
@@ -329,14 +326,14 @@ public class MainActivity extends BaseActivity {
 			null == sButtonValues.get(playerNum).get(Controller.BUTTON_DPAD_RIGHT)) {
 			float dpadX = sAxisValues.get(playerNum).get(MotionEvent.AXIS_HAT_X);
 			if (dpadX > 0.25f) {
-		    	imgDpadRight.setVisibility(View.VISIBLE);
+		    	mImgDpadRight.setVisibility(View.VISIBLE);
 		    } else {
-		    	imgDpadRight.setVisibility(View.INVISIBLE);
+		    	mImgDpadRight.setVisibility(View.INVISIBLE);
 		    }		    
 		    if (dpadX < -0.25f) {
-		    	imgDpadLeft.setVisibility(View.VISIBLE);
+		    	mImgDpadLeft.setVisibility(View.VISIBLE);
 		    } else {
-		    	imgDpadLeft.setVisibility(View.INVISIBLE);
+		    	mImgDpadLeft.setVisibility(View.INVISIBLE);
 		    }
 		}
 		
@@ -344,15 +341,15 @@ public class MainActivity extends BaseActivity {
 			null == sButtonValues.get(playerNum).get(Controller.BUTTON_DPAD_UP)) {
 		    float dpadY = sAxisValues.get(playerNum).get(MotionEvent.AXIS_HAT_Y);	    
 		    if (dpadY > 0.25f) {
-		    	imgDpadDown.setVisibility(View.VISIBLE);
+		    	mImgDpadDown.setVisibility(View.VISIBLE);
 		    } else {
-		    	imgDpadDown.setVisibility(View.INVISIBLE);
+		    	mImgDpadDown.setVisibility(View.INVISIBLE);
 		    }
 		    
 		    if (dpadY < -0.25f) {
-		    	imgDpadUp.setVisibility(View.VISIBLE);
+		    	mImgDpadUp.setVisibility(View.VISIBLE);
 		    } else {
-		    	imgDpadUp.setVisibility(View.INVISIBLE);
+		    	mImgDpadUp.setVisibility(View.INVISIBLE);
 		    }
 		}
 	}
@@ -363,16 +360,16 @@ public class MainActivity extends BaseActivity {
 		//DebugInput.debugOuyaMotionEvent(motionEvent);
 		
 		int playerNum = 0;
-		if (null != txtKeyCode2) {
+		if (null != mTxtKeyCode2) {
 			InputDevice device = motionEvent.getDevice();
 			if (null != device) {
-				txtKeyCode.setText("Original MotionEvent device=" + device.getName());
+				mTxtKeyCode.setText("Original MotionEvent device=" + device.getName());
 				Controller controller = Controller.getControllerByDeviceId(device.getId());
 				if (null == controller) {
-					txtKeyCode2.setText("Remapped MotionEvent device=unknown");
+					mTxtKeyCode2.setText("Remapped MotionEvent device=unknown");
 				} else {
 					playerNum = controller.getPlayerNum();
-					txtKeyCode2.setText("Remapped MotionEvent device=" + controller.getDeviceName()+" playerNum="+controller.getPlayerNum());
+					mTxtKeyCode2.setText("Remapped MotionEvent device=" + controller.getDeviceName()+" playerNum="+controller.getPlayerNum());
 				}
 			}
 		}
@@ -400,30 +397,30 @@ public class MainActivity extends BaseActivity {
         float cos = (float)Math.cos(radians);
         float sin = (float)Math.sin(radians);
 	    
-	    imgLeftStick.setX(AXIS_SCALER * (lsX * cos - lsY * sin));
-	    imgLeftThumb.setY(AXIS_SCALER * (lsX * cos - lsY * sin));
+	    mImgLeftStick.setX(AXIS_SCALER * (lsX * cos - lsY * sin));
+	    mImgLeftThumb.setY(AXIS_SCALER * (lsX * cos - lsY * sin));
 	    
-	    imgLeftStick.setY(AXIS_SCALER * (lsX * sin + lsY * cos));
-	    imgLeftThumb.setY(AXIS_SCALER * (lsX * sin + lsY * cos));
+	    mImgLeftStick.setY(AXIS_SCALER * (lsX * sin + lsY * cos));
+	    mImgLeftThumb.setY(AXIS_SCALER * (lsX * sin + lsY * cos));
 	    
-	    imgRightStick.setX(AXIS_SCALER * (rsX * cos - rsY * sin));
-	    imgRightThumb.setX(AXIS_SCALER * (rsX * cos - rsY * sin));
+	    mImgRightStick.setX(AXIS_SCALER * (rsX * cos - rsY * sin));
+	    mImgRightThumb.setX(AXIS_SCALER * (rsX * cos - rsY * sin));
 	    
-	    imgRightStick.setY(AXIS_SCALER * (rsX * sin + rsY * cos));
-	    imgRightThumb.setY(AXIS_SCALER * (rsX * sin + rsY * cos));
+	    mImgRightStick.setY(AXIS_SCALER * (rsX * sin + rsY * cos));
+	    mImgRightThumb.setY(AXIS_SCALER * (rsX * sin + rsY * cos));
 		
 		//Log.i(TAG, "Unrecognized GenericMotionEvent="+motionEvent.getAction());
 	    
 	    if (l2 > 0.25f) {
-	    	imgLeftTrigger.setVisibility(View.VISIBLE);
+	    	mImgLeftTrigger.setVisibility(View.VISIBLE);
 	    } else {
-	    	imgLeftTrigger.setVisibility(View.INVISIBLE);
+	    	mImgLeftTrigger.setVisibility(View.INVISIBLE);
 	    }
 	    
 	    if (r2 > 0.25f) {
-	    	imgRightTrigger.setVisibility(View.VISIBLE);
+	    	mImgRightTrigger.setVisibility(View.VISIBLE);
 	    } else {
-	    	imgRightTrigger.setVisibility(View.INVISIBLE);
+	    	mImgRightTrigger.setVisibility(View.INVISIBLE);
 	    }
 	    
 		return false;
@@ -439,10 +436,10 @@ public class MainActivity extends BaseActivity {
 		
 		Controller controller = Controller.getControllerByDeviceId(keyEvent.getDeviceId());
 		if (null != controller) {
-			txtKeyCode2.setText("Remapped onKeyDown device=" + controller.getDeviceName() + " KeyCode=(" + keyCode + ") "
+			mTxtKeyCode2.setText("Remapped onKeyDown device=" + controller.getDeviceName() + " KeyCode=(" + keyCode + ") "
 					+ DebugInput.debugGetButtonName(keyCode) + " playerNum="+controller.getPlayerNum());
 		} else {
-			txtKeyCode2.setText("Remapped onKeyDown device=unknown KeyCode=(" + keyCode + ") "
+			mTxtKeyCode2.setText("Remapped onKeyDown device=unknown KeyCode=(" + keyCode + ") "
 					+ DebugInput.debugGetButtonName(keyCode));
 		}
 		
@@ -455,43 +452,43 @@ public class MainActivity extends BaseActivity {
 		switch (keyCode)
 		{
 		case Controller.BUTTON_L1:
-			imgLeftBumper.setVisibility(View.VISIBLE);
+			mImgLeftBumper.setVisibility(View.VISIBLE);
 			break;
 		case KeyEvent.KEYCODE_BUTTON_L2:
-			imgLeftTrigger.setVisibility(View.VISIBLE);
+			mImgLeftTrigger.setVisibility(View.VISIBLE);
 			break;
 		case Controller.BUTTON_L3:
-			imgLeftStick.setVisibility(View.INVISIBLE);
-			imgLeftThumb.setVisibility(View.VISIBLE);
+			mImgLeftStick.setVisibility(View.INVISIBLE);
+			mImgLeftThumb.setVisibility(View.VISIBLE);
 			break;
 		case Controller.BUTTON_R1:
-			imgRightBumper.setVisibility(View.VISIBLE);
+			mImgRightBumper.setVisibility(View.VISIBLE);
 			break;
 		case KeyEvent.KEYCODE_BUTTON_R2:
-			imgRightTrigger.setVisibility(View.VISIBLE);
+			mImgRightTrigger.setVisibility(View.VISIBLE);
 			break;
 		case Controller.BUTTON_R3:
-			imgRightStick.setVisibility(View.INVISIBLE);
-			imgRightThumb.setVisibility(View.VISIBLE);
+			mImgRightStick.setVisibility(View.INVISIBLE);
+			mImgRightThumb.setVisibility(View.VISIBLE);
 			break;
 		case Controller.BUTTON_O:
-			imgButtonO.setVisibility(View.VISIBLE);
+			mImgButtonO.setVisibility(View.VISIBLE);
 			break;
 		case Controller.BUTTON_U:
-			imgButtonU.setVisibility(View.VISIBLE);
+			mImgButtonU.setVisibility(View.VISIBLE);
 			break;
 		case Controller.BUTTON_Y:
-			imgButtonY.setVisibility(View.VISIBLE);
+			mImgButtonY.setVisibility(View.VISIBLE);
 			break;
 		case Controller.BUTTON_A:
-			imgButtonA.setVisibility(View.VISIBLE);
+			mImgButtonA.setVisibility(View.VISIBLE);
 			break;
 		case Controller.BUTTON_DPAD_DOWN:
 			if (keyEvent.getSource() == InputDevice.SOURCE_JOYSTICK ) {
 				updateDPad(playerNum);
 			} else {
 				sButtonValues.get(playerNum).put(Controller.BUTTON_DPAD_DOWN, true);
-				imgDpadDown.setVisibility(View.VISIBLE);
+				mImgDpadDown.setVisibility(View.VISIBLE);
 			}
 			break;
 		case Controller.BUTTON_DPAD_LEFT:
@@ -499,7 +496,7 @@ public class MainActivity extends BaseActivity {
 				updateDPad(playerNum);
 			} else {
 				sButtonValues.get(playerNum).put(Controller.BUTTON_DPAD_LEFT, true);
-				imgDpadLeft.setVisibility(View.VISIBLE);
+				mImgDpadLeft.setVisibility(View.VISIBLE);
 			}
 			break;
 		case Controller.BUTTON_DPAD_RIGHT:
@@ -507,7 +504,7 @@ public class MainActivity extends BaseActivity {
 				updateDPad(playerNum);
 			} else {
 				sButtonValues.get(playerNum).put(Controller.BUTTON_DPAD_RIGHT, true);
-				imgDpadRight.setVisibility(View.VISIBLE);
+				mImgDpadRight.setVisibility(View.VISIBLE);
 			}
 			break;
 		case Controller.BUTTON_DPAD_UP:
@@ -515,11 +512,11 @@ public class MainActivity extends BaseActivity {
 				updateDPad(playerNum);
 			} else {
 				sButtonValues.get(playerNum).put(Controller.BUTTON_DPAD_UP, true);
-				imgDpadUp.setVisibility(View.VISIBLE);
+				mImgDpadUp.setVisibility(View.VISIBLE);
 			}
 			break;
 		case Controller.BUTTON_MENU:
-			imgButtonMenu.setVisibility(View.VISIBLE);
+			mImgButtonMenu.setVisibility(View.VISIBLE);
 			mMenuDetected = System.nanoTime() + 1000000000;
 			break;
 		default:
@@ -540,7 +537,7 @@ public class MainActivity extends BaseActivity {
 
         Controller controller = Controller.getControllerByDeviceId(keyEvent.getDeviceId());
 		if (null != controller) {
-			txtKeyCode2.setText("Remapped onKeyUp device=" + controller.getDeviceName() + " KeyCode=(" + keyCode + ") "
+			mTxtKeyCode2.setText("Remapped onKeyUp device=" + controller.getDeviceName() + " KeyCode=(" + keyCode + ") "
 					+ DebugInput.debugGetButtonName(keyCode) + " playerNum="+controller.getPlayerNum());
 		}
 		
@@ -553,43 +550,43 @@ public class MainActivity extends BaseActivity {
 		switch (keyCode)
 		{
 		case Controller.BUTTON_L1:
-			imgLeftBumper.setVisibility(View.INVISIBLE);
+			mImgLeftBumper.setVisibility(View.INVISIBLE);
 			break;
 		case KeyEvent.KEYCODE_BUTTON_L2:
-			imgLeftTrigger.setVisibility(View.INVISIBLE);
+			mImgLeftTrigger.setVisibility(View.INVISIBLE);
 			break;
 		case Controller.BUTTON_L3:
-			imgLeftStick.setVisibility(View.VISIBLE);
-			imgLeftThumb.setVisibility(View.INVISIBLE);
+			mImgLeftStick.setVisibility(View.VISIBLE);
+			mImgLeftThumb.setVisibility(View.INVISIBLE);
 			break;
 		case Controller.BUTTON_R1:
-			imgRightBumper.setVisibility(View.INVISIBLE);
+			mImgRightBumper.setVisibility(View.INVISIBLE);
 			break;
 		case KeyEvent.KEYCODE_BUTTON_R2:
-			imgRightTrigger.setVisibility(View.INVISIBLE);
+			mImgRightTrigger.setVisibility(View.INVISIBLE);
 			break;
 		case Controller.BUTTON_R3:
-			imgRightStick.setVisibility(View.VISIBLE);
-			imgRightThumb.setVisibility(View.INVISIBLE);
+			mImgRightStick.setVisibility(View.VISIBLE);
+			mImgRightThumb.setVisibility(View.INVISIBLE);
 			break;
 		case Controller.BUTTON_O:
-			imgButtonO.setVisibility(View.INVISIBLE);
+			mImgButtonO.setVisibility(View.INVISIBLE);
 			break;
 		case Controller.BUTTON_U:
-			imgButtonU.setVisibility(View.INVISIBLE);
+			mImgButtonU.setVisibility(View.INVISIBLE);
 			break;
 		case Controller.BUTTON_Y:
-			imgButtonY.setVisibility(View.INVISIBLE);
+			mImgButtonY.setVisibility(View.INVISIBLE);
 			break;
 		case Controller.BUTTON_A:
-			imgButtonA.setVisibility(View.INVISIBLE);
+			mImgButtonA.setVisibility(View.INVISIBLE);
 			break;
 		case Controller.BUTTON_DPAD_DOWN:
 			if (keyEvent.getSource() == InputDevice.SOURCE_JOYSTICK ) {
 				updateDPad(playerNum);
 			} else {
 				sButtonValues.get(playerNum).put(Controller.BUTTON_DPAD_DOWN, false);
-				imgDpadDown.setVisibility(View.INVISIBLE);
+				mImgDpadDown.setVisibility(View.INVISIBLE);
 			}
 			break;
 		case Controller.BUTTON_DPAD_LEFT:
@@ -597,7 +594,7 @@ public class MainActivity extends BaseActivity {
 				updateDPad(playerNum);
 			} else {
 				sButtonValues.get(playerNum).put(Controller.BUTTON_DPAD_LEFT, false);
-				imgDpadLeft.setVisibility(View.INVISIBLE);
+				mImgDpadLeft.setVisibility(View.INVISIBLE);
 			}
 			break;
 		case Controller.BUTTON_DPAD_RIGHT:
@@ -605,7 +602,7 @@ public class MainActivity extends BaseActivity {
 				updateDPad(playerNum);
 			} else {
 				sButtonValues.get(playerNum).put(Controller.BUTTON_DPAD_RIGHT, false);
-				imgDpadRight.setVisibility(View.INVISIBLE);
+				mImgDpadRight.setVisibility(View.INVISIBLE);
 			}
 			break;
 		case Controller.BUTTON_DPAD_UP:
@@ -613,7 +610,7 @@ public class MainActivity extends BaseActivity {
 				updateDPad(playerNum);
 			} else {
 				sButtonValues.get(playerNum).put(Controller.BUTTON_DPAD_UP, false);
-				imgDpadUp.setVisibility(View.INVISIBLE);
+				mImgDpadUp.setVisibility(View.INVISIBLE);
 			}
 			break;
 		case Controller.BUTTON_MENU:
