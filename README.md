@@ -1,2 +1,2 @@
 # java-razer-sdk
-Java samples for the Razer SDK
+Documentation for the Razer SDK Java Samples can be found at https://github.com/ouya/docs/blob/razer-sdk/java.md.
