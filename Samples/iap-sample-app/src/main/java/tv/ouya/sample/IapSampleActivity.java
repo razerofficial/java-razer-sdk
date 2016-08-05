@@ -20,6 +20,8 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.*;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -29,6 +31,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.razerzone.store.sdk.AuthenticationHelper;
@@ -219,6 +222,16 @@ public class IapSampleActivity extends Activity {
         };
 
         setContentView(R.layout.sample_app);
+
+        TextView txtVersionCode = (TextView) findViewById(R.id.txtVersionCodeVal);
+        TextView txtVersionName = (TextView) findViewById(R.id.txtVersionNameVal);
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            String strVersionCode = Integer.toString(pInfo.versionCode);
+            txtVersionCode.setText(strVersionCode);
+            txtVersionName.setText(pInfo.versionName);
+        } catch (PackageManager.NameNotFoundException e) {
+        }
 
         mReceiptListView = (ListView) findViewById(R.id.receipts);
         mReceiptListView.setFocusable(false);

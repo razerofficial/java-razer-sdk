@@ -48,8 +48,8 @@ android {
         targetSdkVersion 23
         minSdkVersion 19
 
-        versionName '1.0'
-        versionCode 1
+        versionName '2.0 ABC'
+        versionCode 2
 
         applicationId 'tv.ouya.sample'
     }
