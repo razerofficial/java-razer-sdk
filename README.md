@@ -236,7 +236,7 @@ The activity must implement `onActivityResult`. The activity results must be pas
 
 ### RequestGamerInfo
 
-`requestGamerInfo` receives the `GamerInfo` about the logged in user. The method takes a listener for success, failure, and cancel callbacks. The context parameter can use the game activity. This method should only be invoked after the `RazerSDK` has successfully initialized. The success callback is invoked if the operation completes successfully. The failure callback is invoked if the operation failed. The cancel callback is invoked if the operation was canceled. The success event receives the `GamerInfo` for the logged in user.
+`requestGamerInfo` receives the `GamerInfo` about the logged in user. The method takes a listener for success, failure, and cancel callbacks. The context parameter can use the game activity. This method should only be invoked after the `StoreFacade` has successfully initialized. The success callback is invoked if the operation completes successfully. The failure callback is invoked if the operation failed. The cancel callback is invoked if the operation was canceled. The success event receives the `GamerInfo` for the logged in user.
 
 ```
         storeFacade.requestGamerInfo(this, new ResponseListener<GamerInfo>() {
@@ -268,7 +268,7 @@ public class GamerInfo {
 
 ### RequestProductList
 
-`requestProductList` returns the product details given the context, and `String` array of `identifiers`. The method also takes a listener for the success, failure, and cancel callbacks. The context parameter can use the game activity. This method should only be invoked after the `RazerSDK` has successfully initialized. The `identifiers` can be `ENTITLEMENTS` and/or `CONSUMABLES`.
+`requestProductList` returns the product details given the context, and `String` array of `identifiers`. The method also takes a listener for the success, failure, and cancel callbacks. The context parameter can use the game activity. This method should only be invoked after the `StoreFacade` has successfully initialized. The `identifiers` can be `ENTITLEMENTS` and/or `CONSUMABLES`.
 
 ```
 		String[] identifiers = new String[] {
@@ -315,7 +315,7 @@ public class Product {
 
 ### RequestPurchase
 
-`requestPurchase` initiates a purchase for the logged in user given the context, `identifier` and `product type` of an `ENTITLEMENT` or `CONSUMABLE`. The method also takes a listener for the success, failure, and cancel callbacks. The context parameter can use the game activity. This method should only be invoked after the `RazerSDK` has successfully initialized. Entitlements and consumables need to correspond to the items that were created in the [developer portal](https://devs.ouya.tv).
+`requestPurchase` initiates a purchase for the logged in user given the context, `identifier` and `product type` of an `ENTITLEMENT` or `CONSUMABLE`. The method also takes a listener for the success, failure, and cancel callbacks. The context parameter can use the game activity. This method should only be invoked after the `StoreFacade` has successfully initialized. Entitlements and consumables need to correspond to the items that were created in the [developer portal](https://devs.ouya.tv).
 
 Set the product type to `ENTITLEMENT` or `CONSUMABLE`.
 
@@ -383,7 +383,7 @@ public class PurchaseResult {
 
 ### RequestReceipts
 
-`requestReceipts` returns all the `ENTITLEMENT` receipts for the logged in user. The method takes a context and a listener for success, failure, and cancel callbacks. The context parameter can use the game activity. This method should only be invoked after the `RazerSDK` has successfully initialized.
+`requestReceipts` returns all the `ENTITLEMENT` receipts for the logged in user. The method takes a context and a listener for success, failure, and cancel callbacks. The context parameter can use the game activity. This method should only be invoked after the `StoreFacade` has successfully initialized.
 
 ```
         storeFacade.requestReceipts(this, new ResponseListener<Collection<Receipt>>() {
@@ -421,7 +421,7 @@ public class Receipt {
 
 ### Shutdown
 
-The `shutdown` method should only be invoked after the `RazerSDK` has successfully initialized. The `RazerSDK` must be shutdown before exiting the application.
+The `shutdown` method should only be invoked after the `StoreFacade` has successfully initialized. The `RazerSDK` must be shutdown before exiting the application.
 
 ```
         storeFacade.shutdown(new CancelIgnoringResponseListener() {
