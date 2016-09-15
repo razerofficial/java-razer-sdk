@@ -228,10 +228,195 @@ The activity must implement `onActivityResult`. The activity results must be pas
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         // Forward this result to the facade, in case it is waiting for any activity results
         if(mStoreFacade.processActivityResult(requestCode, resultCode, data)) {
-            Log.d(LOG_TAG, "onActivityResult: StoreFacade processed activity result");
+            Log.d(TAG, "onActivityResult: StoreFacade processed activity result");
             return;
         }
     }
+```
+
+### RequestGamerInfo
+
+`requestGamerInfo` receives the `GamerInfo` about the logged in user. The method takes a listener for success, failure, and cancel callbacks. The context parameter can use the game activity. This method should only be invoked after the `RazerSDK` has successfully initialized. The success callback is invoked if the operation completes successfully. The failure callback is invoked if the operation failed. The cancel callback is invoked if the operation was canceled. The success event receives the `GamerInfo` for the logged in user.
+
+```
+        storeFacade.requestGamerInfo(this, new ResponseListener<GamerInfo>() {
+            @Override
+            public void onSuccess(GamerInfo result) {
+                Log.d(TAG, "requestGamerInfo listener: onSuccess username="+result.getUsername()+" uuid="+result.getUuid());
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMessage, Bundle bundle) {
+                Log.e(TAG, "requestGamerInfo listener: onFailure errorCode="+errorCode+" errorMessage="+errorMessage);
+            }
+
+            @Override
+            public void onCancel(int errorCode, String errorMessage, Bundle bundle) {
+                Log.e(TAG, "requestGamerInfo listener: onCancel");
+            }
+        });
+```
+
+`GamerInfo` accessors:
+
+```
+public class GamerInfo {
+    public String getUsername();
+    public String getUuid();
+}
+```
+
+### RequestProductList
+
+`requestProductList` returns the product details given the context, and `String` array of `identifiers`. The method also takes a listener for the success, failure, and cancel callbacks. The context parameter can use the game activity. This method should only be invoked after the `RazerSDK` has successfully initialized. The `identifiers` can be `ENTITLEMENTS` and/or `CONSUMABLES`.
+
+```
+		String[] identifiers = new String[] {
+			"long_sword",
+			"sharp_axe",
+			"awesome_sauce",
+			"cat_facts",
+			"__DECLINED__THIS_PURCHASE"
+		};
+
+        storeFacade.requestProductList(this, identifiers, new ResponseListener<List<Product>>() {
+            @Override
+            public void onSuccess(Collection<Product> results) {
+                Log.d(TAG, "requestProductList listener: onSuccess");
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMessage, Bundle bundle) {
+                Log.e(TAG, "requestProductList listener: onFailure errorCode="+errorCode+" errorMessage="+errorMessage);
+            }
+
+            @Override
+            public void onCancel(int errorCode, String errorMessage, Bundle bundle) {
+                Log.e(TAG, "requestProductList listener: onCancel");
+            }
+        });
+```
+
+`Product` accessors:
+
+```
+public class Product {
+    public String getCurrencyCode();
+    public String getDescription();
+    public String getDeveloperName();
+    public String getIdentifier();
+    public double getLocalPrice();
+    public String getName();
+    public double getOriginalPrice();
+    public double getPercentOff();
+    public String getFormattedPrice();
+}
+```
+
+### RequestPurchase
+
+`requestPurchase` initiates a purchase for the logged in user given the context, `identifier` and `product type` of an `ENTITLEMENT` or `CONSUMABLE`. The method also takes a listener for the success, failure, and cancel callbacks. The context parameter can use the game activity. This method should only be invoked after the `RazerSDK` has successfully initialized. Entitlements and consumables need to correspond to the items that were created in the [developer portal](https://devs.ouya.tv).
+
+Set the product type to `ENTITLEMENT` or `CONSUMABLE`.
+
+```
+		// ENTITLEMENT
+        Product.Type productType = Product.Type.ENTITLEMENT;
+      
+
+		// CONSUMABLE
+        Product.Type productType = Product.Type.CONSUMABLE;
+```
+
+Prepare the product.
+
+```
+        String identifier = "sharp_axe";
+        String name = "";
+        int priceInCents = 0;
+        double localPrice = 0;
+        String currencyCode = "";
+        double originalPrice = 0;
+        double percentOff = 0;
+        String description = "";
+        String developerName = "";
+        Product product = new Product(identifier, name, priceInCents, localPrice, currencyCode,
+                originalPrice, percentOff, description, developerName, productType);
+```
+
+Create the purchasable using the product.
+
+```
+Purchasable purchasable = product.createPurchasable();
+```
+
+Request the purchase.
+
+```
+
+		// Request purchase
+        storeFacade.requestPurchase(this, purchasable, new ResponseListener<PurchaseResult>() {
+            @Override
+            public void onSuccess(PurchaseResult result) {
+                Log.d(TAG, "requestPurchase listener: onSuccess identifier="+result.getProductIdentifier());
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMessage, Bundle bundle) {
+                Log.e(TAG, "requestPurchase listener: onFailure errorCode="+errorCode+" errorMessage="+errorMessage);
+            }
+
+            @Override
+            public void onCancel(int errorCode, String errorMessage, Bundle bundle) {
+                Log.e(TAG, "requestPurchase listener: onCancel");
+            }
+        });
+```
+
+`PurchaseResult` accessors:
+
+```
+public class PurchaseResult {
+    public String getProductIdentifier();
+}
+```
+
+### RequestReceipts
+
+`requestReceipts` returns all the `ENTITLEMENT` receipts for the logged in user. The method takes a context and a listener for success, failure, and cancel callbacks. The context parameter can use the game activity. This method should only be invoked after the `RazerSDK` has successfully initialized.
+
+```
+        storeFacade.requestReceipts(this, new ResponseListener<Collection<Receipt>>() {
+            @Override
+            public void onSuccess(Collection<Receipt> results) {
+                Log.d(TAG, "requestReceipts listener: onSuccess");
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMessage, Bundle bundle) {
+                Log.e(TAG, "requestReceipts listener: onFailure errorCode="+errorCode+" errorMessage="+errorMessage);
+            }
+
+            @Override
+            public void onCancel(int errorCode, String errorMessage, Bundle bundle) {
+                Log.e(TAG, "requestReceipts listener: onCancel");
+            }
+        });
+```
+
+`Receipt` accessors:
+
+```
+public class Receipt {
+	public String getCurrency();
+	public String getFormattedPrice();
+	public String getGamer();
+	public Date getGeneratedDate();
+	public String getIdentifier();
+	public double getLocalPrice();
+    public Date getPurchaseDate();
+    public String getUuid();
+}
 ```
 
 ### Shutdown
@@ -239,7 +424,6 @@ The activity must implement `onActivityResult`. The activity results must be pas
 The `shutdown` method should only be invoked after the `RazerSDK` has successfully initialized. The `RazerSDK` must be shutdown before exiting the application.
 
 ```
-        StoreFacade storeFacade = StoreFacade.getInstance();
         storeFacade.shutdown(new CancelIgnoringResponseListener() {
             @Override
             public void onSuccess(Bundle bundle) {
