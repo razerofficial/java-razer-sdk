@@ -14,27 +14,6 @@ This document is for developers that uses Java to make apps for Android. The doc
 
 Java apps/games use the `store-sdk-standard-release.aar` library included in the `RazerSDK` downloadable from the [Cortex developer portal](http://devs.ouya.tv).
 
-## Icons
-
-Content review requires that a `48x48` icon must be provided. I.e. [res/drawable-mdpi/icon.png](https://github.com/razerofficial/java-razer-sdk/blob/master/Samples/iap-sample-app/res/drawable-mdpi/icon.png)
-
-## AndroidManifest.xml
-
-The intent-filter specifies categories for the `leanback launcher` and `Razer` store. Apps use the category `com.razerzone.store.category.APP`. Games use the category `com.razerzone.store.category.GAME`.
-
-```
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
-                <category android:name="com.razerzone.store.category.APP" />
-            </intent-filter>
-```
-
-## store-sdk-standard-release.aar
-
-The `store-sdk-standard-release.aar` Java library released through the developer portal which provides access to the `RazerSDK`.
-
 ## Java Samples
 
 ### In-App-Purchases Sample
@@ -58,7 +37,7 @@ public class CustomActivity extends Activity
 	private StoreFacade mStoreFacade = null;
 	
 	// listener for init complete
-	private ResponseListener<Bundle> mInitCompleteListener = null;
+	private CancelIgnoringResponseListener<Bundle> mInitCompleteListener = null;
 
 	// listener for fetching gamer info
 	private ResponseListener<GamerInfo> mRequestGamerInfoListener = null;
@@ -92,31 +71,10 @@ Each game entry in the [developer portal](https://devs.ouya.tv) has a `Secret AP
 	  "dTUwUTc1WHlNQlBWVlF0SFpOd0lEQVFBQiJ9"; 
 ```
 
-The `StoreFacade` can use the `Secret API Key` and create the `Bundle` used for initialization.
+The sample implements the following listeners to pass to the `StoreFacade` IAP methods.
 
 ```
-		Bundle developerInfo = null;
-		try {
-			developerInfo = StoreFacade.createInitBundle(SECRET_API_KEY);
-		} catch (InvalidParameterException e) {
-			Log.e(TAG, e.getMessage());
-			abort();
-			return;
-		}
-
-		if (sEnableLogging) {
-			Log.d(TAG, "developer_id=" + developerInfo.getString(StoreFacade.DEVELOPER_ID));
-		}
-
-		if (sEnableLogging) {
-			Log.d(TAG, "developer_public_key length=" + developerInfo.getByteArray(StoreFacade.DEVELOPER_PUBLIC_KEY).length);
-		}
-```
-
-Implement the listeners to pass to the `StoreFacade` IAP methods.
-
-```
-		mInitCompleteListener = new ResponseListener<Bundle>() {
+		mInitCompleteListener = new CancelIgnoringResponseListener<Bundle>() {
 			@Override
 			public void onSuccess(Bundle bundle) {
 				Log.d(TAG, "InitCompleteListener onSuccess");
@@ -125,11 +83,6 @@ Implement the listeners to pass to the `StoreFacade` IAP methods.
 			@Override
 			public void onFailure(int i, String s, Bundle bundle) {
 				Log.e(TAG, "InitCompleteListener onFailure");
-			}
-
-			@Override
-			public void onCancel() {
-				Log.e(TAG, "InitCompleteListener onCancel");
 			}
 		};
 
@@ -214,6 +167,88 @@ Implement the listeners to pass to the `StoreFacade` IAP methods.
         };
 ```
 
-## More
+## Razer SDK
 
-* Be sure to check out the [in-app-purchasing](https://github.com/ouya/docs/blob/razer-sdk/purchasing.md#in-app-purchasing) document for additional `IAP` details.
+The `store-sdk-standard-release.aar` Java library released through the developer portal which provides access to the `RazerSDK`.
+
+## Icons
+
+Content review requires that a `48x48` icon must be provided. I.e. [res/drawable-mdpi/icon.png](https://github.com/razerofficial/java-razer-sdk/blob/master/Samples/iap-sample-app/res/drawable-mdpi/icon.png)
+
+## AndroidManifest.xml
+
+The intent-filter specifies categories for the `leanback launcher` and `Razer` store. Apps use the category `com.razerzone.store.category.APP`. Games use the category `com.razerzone.store.category.GAME`.
+
+```
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+                <category android:name="com.razerzone.store.category.APP" />
+            </intent-filter>
+```
+
+### Init
+
+Before invoking `StoreFacade` methods, the `StoreFacade` needs to be initialized. The developer info can be created using the `SecretApiKey` from the [developer portal](https://devs.ouya.tv) that is used for initialization.
+
+```
+		Bundle developerInfo = null;
+		try {
+			developerInfo = StoreFacade.createInitBundle(SECRET_API_KEY);
+		} catch (InvalidParameterException e) {
+			Log.e(TAG, e.getMessage());
+		}
+```
+
+Register the success and failure callbacks and then initialize the `StoreFacade`. The `init` method takes a context and bundle parameter. The context parameter can use the game activity. The developer info is prepared above.
+
+```
+        StoreFacade storeFacade = StoreFacade.getInstance();
+        storeFacade.registerInitCompletedListener(new CancelIgnoringResponseListener<Bundle>() {
+            @Override
+            public void onSuccess(Bundle bundle) {
+                Log.d(TAG, "init listener: onSuccess");
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMessage, Bundle bundle) {
+                Log.e(TAG, "init listener: onFailure errorCode="+errorCode+" errorMessage="+errorMessage);
+            }
+        });
+        storeFacade.init(this, developerInfo);
+```
+
+### OnActivityResult
+
+The activity must implement `onActivityResult`. The activity results must be passed to the `StoreFacade` via processActivityResult.
+
+```
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        // Forward this result to the facade, in case it is waiting for any activity results
+        if(mStoreFacade.processActivityResult(requestCode, resultCode, data)) {
+            Log.d(LOG_TAG, "onActivityResult: StoreFacade processed activity result");
+            return;
+        }
+    }
+```
+
+### Shutdown
+
+The `shutdown` method should only be invoked after the `RazerSDK` has successfully initialized. The `RazerSDK` must be shutdown before exiting the application.
+
+```
+        StoreFacade storeFacade = StoreFacade.getInstance();
+        storeFacade.shutdown(new CancelIgnoringResponseListener() {
+            @Override
+            public void onSuccess(Bundle bundle) {
+                Log.d(TAG, "shutdown listener: onSuccess");
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMessage, Bundle bundle) {
+                Log.e(TAG, "shutdown listener: onFailure errorCode="+errorCode+" errorMessage="+errorMessage);
+            }
+        });
+```
