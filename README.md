@@ -39,16 +39,19 @@ public class CustomActivity extends Activity
 	// listener for init complete
 	private CancelIgnoringResponseListener<Bundle> mInitCompleteListener = null;
 
-	// listener for fetching gamer info
+	// listener for requesting login
+	private ResponseListener<Void> mRequestLoginListener = null;
+
+	// listener for requesting gamer info
 	private ResponseListener<GamerInfo> mRequestGamerInfoListener = null;
 
-	// listener for getting products
+	// listener for requesting product details
 	private ResponseListener<List<Product>> mRequestProductsListener = null;
 
-	// listener for requesting purchase
+	// listener for requesting a purchase
 	private ResponseListener<PurchaseResult> mRequestPurchaseListener = null;
 
-	// listener for getting receipts
+	// listener for requesting receipts
 	private ResponseListener<Collection<Receipt>> mRequestReceiptsListener = null;
 
     // listener for shutdown
@@ -85,6 +88,23 @@ The sample implements the following listeners to pass to the `StoreFacade` IAP m
 				Log.e(TAG, "InitCompleteListener onFailure");
 			}
 		};
+
+		mRequestLoginListener = new ResponseListener<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+            	Log.d(TAG, "RequestLoginListener: onSuccess");
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMessage, Bundle optionalData) {
+            	Log.d(TAG, "RequestLoginListener: onFailure errorCode="+errorCode+" errorMessage="+errorMessage);
+            }
+
+			@Override
+			public void onCancel() {
+				Log.e(TAG, "RequestLoginListener onCancel");
+			}
+        };
 
 		mRequestGamerInfoListener = new ResponseListener<GamerInfo>() {
             @Override
@@ -234,9 +254,32 @@ The activity must implement `onActivityResult`. The activity results must be pas
     }
 ```
 
+### RequestLogin
+
+`requestLogin` opens the login dialog if a user isn't currently logged in. The method takes a listener for success, failure, and cancel callbacks. The context parameter can use the game activity. This method should only be invoked after the `StoreFacade` has successfully initialized. The success callback is invoked if the operation completes successfully. The failure callback is invoked if the operation failed. The cancel callback is invoked if the operation was canceled. The success event is invoked when the user is logged in. The failure event is invoked if the user could not be logged in. The cancel event will fire if the user dismisses the login dialog without logging in.
+
+```
+        storeFacade.requestLogin(this, new ResponseListener<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                Log.d(TAG, "requestLogin listener: onSuccess");
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMessage, Bundle bundle) {
+                Log.e(TAG, "requestLogin listener: onFailure errorCode="+errorCode+" errorMessage="+errorMessage);
+            }
+
+            @Override
+            public void onCancel(int errorCode, String errorMessage, Bundle bundle) {
+                Log.e(TAG, "requestLogin listener: onCancel");
+            }
+        });
+```
+
 ### RequestGamerInfo
 
-`requestGamerInfo` receives the `GamerInfo` about the logged in user. The method takes a listener for success, failure, and cancel callbacks. The context parameter can use the game activity. This method should only be invoked after the `StoreFacade` has successfully initialized. The success callback is invoked if the operation completes successfully. The failure callback is invoked if the operation failed. The cancel callback is invoked if the operation was canceled. The success event receives the `GamerInfo` for the logged in user.
+`requestGamerInfo` receives the `GamerInfo` about the logged in user. The method takes a listener for success, failure, and cancel callbacks. The context parameter can use the game activity. This method should only be invoked after the `StoreFacade` has successfully initialized. The success callback is invoked if the operation completes successfully. The failure callback is invoked if the operation failed. The cancel callback is invoked if the operation was canceled. The success event receives the `GamerInfo` for the logged in user. The failure event will be invoked if the user is not logged in.
 
 ```
         storeFacade.requestGamerInfo(this, new ResponseListener<GamerInfo>() {
@@ -315,7 +358,7 @@ public class Product {
 
 ### RequestPurchase
 
-`requestPurchase` initiates a purchase for the logged in user given the context, `identifier` and `product type` of an `ENTITLEMENT` or `CONSUMABLE`. The method also takes a listener for the success, failure, and cancel callbacks. The context parameter can use the game activity. This method should only be invoked after the `StoreFacade` has successfully initialized. Entitlements and consumables need to correspond to the items that were created in the [developer portal](https://devs.ouya.tv).
+`requestPurchase` initiates a purchase for the logged in user given the context, `identifier` and `product type` of an `ENTITLEMENT` or `CONSUMABLE`. The method also takes a listener for the success, failure, and cancel callbacks. The context parameter can use the game activity. This method should only be invoked after the `StoreFacade` has successfully initialized. Entitlements and consumables need to correspond to the items that were created in the [developer portal](https://devs.ouya.tv). The failure event will be invoked if the user is not logged in.
 
 Set the product type to `ENTITLEMENT` or `CONSUMABLE`.
 
@@ -383,7 +426,7 @@ public class PurchaseResult {
 
 ### RequestReceipts
 
-`requestReceipts` returns all the `ENTITLEMENT` receipts for the logged in user. The method takes a context and a listener for success, failure, and cancel callbacks. The context parameter can use the game activity. This method should only be invoked after the `StoreFacade` has successfully initialized.
+`requestReceipts` returns all the `ENTITLEMENT` receipts for the logged in user. The method takes a context and a listener for success, failure, and cancel callbacks. The context parameter can use the game activity. This method should only be invoked after the `StoreFacade` has successfully initialized. The failure event will be invoked if the user is not logged in.
 
 ```
         storeFacade.requestReceipts(this, new ResponseListener<Collection<Receipt>>() {
