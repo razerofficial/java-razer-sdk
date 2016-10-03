@@ -221,11 +221,11 @@ Before invoking `StoreFacade` methods, the `StoreFacade` needs to be initialized
 		}
 ```
 
-Register the success and failure callbacks and then initialize the `StoreFacade`. The `init` method takes a context and bundle parameter. The context parameter can use the game activity. The developer info is prepared above.
+Initialize the `StoreFacade` before invoking `IAP` methods. The `init` method takes a context, bundle parameter, and callback listener. The context parameter can use the game activity. The developer info is prepared above. The callback listener handles `onSuccess` and `onFailure` callbacks.
 
 ```
         StoreFacade storeFacade = StoreFacade.getInstance();
-        storeFacade.registerInitCompletedListener(new CancelIgnoringResponseListener<Bundle>() {
+        storeFacade.init(this, developerInfo, new CancelIgnoringResponseListener<Bundle>() {
             @Override
             public void onSuccess(Bundle bundle) {
                 Log.d(TAG, "init listener: onSuccess");
@@ -236,7 +236,6 @@ Register the success and failure callbacks and then initialize the `StoreFacade`
                 Log.e(TAG, "init listener: onFailure errorCode="+errorCode+" errorMessage="+errorMessage);
             }
         });
-        storeFacade.init(this, developerInfo);
 ```
 
 ### OnActivityResult
