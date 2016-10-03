@@ -24,6 +24,7 @@
             <TextView android:id="@+id/txtVersionName" style="@style/wrap" android:textSize="18sp" android:textColor="#ccc" android:text="VersionName: " android:layout_alignParentTop="true" />
             <TextView android:id="@+id/txtVersionNameVal" style="@style/wrap" android:textSize="18sp" android:textColor="#ccc" />
         </LinearLayout>
+        <Button android:id="@+id/login_button" style="@style/wrap" android:text="Login" android:layout_alignParentBottom="true" android:layout_centerHorizontal="true" />
         <TextView android:id="@+id/text1" style="@style/wrap" android:textSize="18sp" android:textColor="#ccc" android:text="List of products for purchase" />
         <LinearLayout android:id="@+id/products" style="@style/wide" android:layout_below="@id/text1" android:orientation="vertical" />
         <TextView android:id="@+id/text2" style="@style/wrap" android:textSize="18sp" android:textColor="#ccc" android:text="List of all owned products" android:layout_below="@id/products" />

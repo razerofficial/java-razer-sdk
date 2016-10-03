@@ -16,14 +16,12 @@
 
 package tv.ouya.sample;
 
-import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.*;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -33,8 +31,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.razerzone.store.sdk.AuthenticationHelper;
 import com.razerzone.store.sdk.CancelIgnoringResponseListener;
 import com.razerzone.store.sdk.ErrorCodes;
 import com.razerzone.store.sdk.GamerInfo;
@@ -44,9 +40,7 @@ import com.razerzone.store.sdk.StoreFacade;
 import com.razerzone.store.sdk.purchases.Product;
 import com.razerzone.store.sdk.purchases.Purchasable;
 import com.razerzone.store.sdk.purchases.Receipt;
-
 import org.json.JSONException;
-
 import java.io.UnsupportedEncodingException;
 import java.lang.String;
 import java.security.GeneralSecurityException;
@@ -60,7 +54,6 @@ public class IapSampleActivity extends Activity {
     /**
      * The tag for log messages
      */
-
     private static final String LOG_TAG = "RazerIapSample";
 
     private static final boolean sEnableLogging = true;
@@ -108,26 +101,7 @@ public class IapSampleActivity extends Activity {
             "__DECLINED__THIS_PURCHASE"
     };
 
-    /**
-     * The saved instance state key for products
-     */
-
-    private static final String PRODUCTS_INSTANCE_STATE_KEY = "Products";
-
-    /**
-     * The saved instance state key for receipts
-     */
-
-    private static final String RECEIPTS_INSTANCE_STATE_KEY = "Receipts";
-
-    /**
-     * The ID used to track the activity started by an authentication intent during a request for
-     * the gamers UUID.
-     */
-
-    private static final int GAMER_UUID_AUTHENTICATION_ACTIVITY_ID = 2;
-
-    /**
+   /**
      * The receipt adapter will display a previously-purchased item in a cell in a ListView. It's not part of the in-app
      * purchase API. Neither is the ListView itself.
      */
@@ -141,25 +115,8 @@ public class IapSampleActivity extends Activity {
     private List<Product> mProductList;
     private List<Receipt> mReceiptList;
 
-    /**
-     * The outstanding purchase request UUIDs.
-     */
-
-    private final Map<String, Product> mOutstandingPurchaseRequests = new HashMap<String, Product>();
-
     // listener for shutdown
     private CancelIgnoringResponseListener mShutdownListener = null;
-
-    /**
-     * Broadcast listener to handle re-requesting the receipts when a user has re-authenticated
-     */
-
-    private BroadcastReceiver mAuthChangeReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            requestReceipts();
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -189,24 +146,6 @@ public class IapSampleActivity extends Activity {
         developerInfo.putString(StoreFacade.XIAOMI_APPLICATION_KEY, XIAOMI_APP_KEY);
 
         mStoreFacade = StoreFacade.getInstance();
-        mStoreFacade.init(this, developerInfo);
-        mStoreFacade.registerInitCompletedListener(new CancelIgnoringResponseListener<Bundle>() {
-            @Override
-            public void onSuccess(Bundle bundle) {
-                // Request the product list if it could not be restored from the savedInstanceState Bundle
-                if(mProductList == null) {
-                    requestProducts();
-                }
-
-                // Request an up to date list of receipts for the user.
-                requestReceipts();
-            }
-
-            @Override
-            public void onFailure(int i, String s, Bundle bundle) {
-                Log.e(LOG_TAG, "Error initializing StoreFacade: " + s);
-            }
-        });
 
         mShutdownListener = new CancelIgnoringResponseListener() {
             @Override
@@ -221,7 +160,35 @@ public class IapSampleActivity extends Activity {
             }
         };
 
+        mStoreFacade.init(this, developerInfo, new CancelIgnoringResponseListener<Bundle>() {
+            @Override
+            public void onSuccess(Bundle bundle) {
+
+                if (sEnableLogging) {
+                    Log.d(LOG_TAG, "init listener: onSuccess");
+                }
+
+                // Request the product list if it could not be restored from the savedInstanceState Bundle
+                if(mProductList == null) {
+                    requestProducts();
+                }
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMessage, Bundle bundle) {
+                Log.e(LOG_TAG, "init listener: onFailure errorCode="+errorCode+" errorMessage="+errorMessage);
+            }
+        });
+
         setContentView(R.layout.sample_app);
+
+        Button btnLogin = (Button) findViewById(R.id.login_button);
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requestLogin();
+            }
+        });
 
         TextView txtVersionCode = (TextView) findViewById(R.id.txtVersionCodeVal);
         TextView txtVersionName = (TextView) findViewById(R.id.txtVersionNameVal);
@@ -245,29 +212,9 @@ public class IapSampleActivity extends Activity {
         findViewById(R.id.gamer_uuid_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fetchGamerInfo();
+                requestGamerInfo();
             }
         });
-
-        // Attempt to restore the product and receipt list from the savedInstanceState Bundle
-        if(savedInstanceState != null) {
-            if(savedInstanceState.containsKey(PRODUCTS_INSTANCE_STATE_KEY)) {
-                Parcelable[] products = savedInstanceState.getParcelableArray(PRODUCTS_INSTANCE_STATE_KEY);
-                mProductList = new ArrayList<Product>(products.length);
-                for(Parcelable product : products) {
-                    mProductList.add((Product) product);
-                }
-                addProducts();
-            }
-            if(savedInstanceState.containsKey(RECEIPTS_INSTANCE_STATE_KEY))  {
-                Parcelable[] receipts = savedInstanceState.getParcelableArray(RECEIPTS_INSTANCE_STATE_KEY);
-                mReceiptList = new ArrayList<Receipt>(receipts.length);
-                for(Parcelable receipt : receipts) {
-                    mReceiptList.add((Receipt) receipt);
-                }
-                addReceipts();
-            }
-        }
 
         // Make sure the receipt ListView starts empty if the receipt list could not be restored
         // from the savedInstanceState Bundle.
@@ -276,32 +223,10 @@ public class IapSampleActivity extends Activity {
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // Register to receive notifications about account changes. This will re-query
-        // the receipt list in order to ensure it is always up to date for whomever
-        // is logged in.
-        IntentFilter accountsChangedFilter = new IntentFilter(AccountManager.LOGIN_ACCOUNTS_CHANGED_ACTION);
-        registerReceiver(mAuthChangeReceiver, accountsChangedFilter);
-    }
-
-    /**
-     * Unregister the account change listener when the application is paused.
-     */
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        unregisterReceiver(mAuthChangeReceiver);
-    }
-
     /**
      * Check for the result from a call through to the authentication intent. If the authentication was
      * successful then re-try the purchase.
      */
-
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         Log.d(LOG_TAG, "Processing activity result");
@@ -310,28 +235,6 @@ public class IapSampleActivity extends Activity {
         if(mStoreFacade.processActivityResult(requestCode, resultCode, data)) {
             Log.d(LOG_TAG, "mStoreFacade processed activity result");
             return;
-        }
-
-        if(resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case GAMER_UUID_AUTHENTICATION_ACTIVITY_ID:
-                    fetchGamerInfo();
-                    break;
-            }
-        }
-    }
-
-    /**
-     * Save the products and receipts if we're going for a restart
-     */
-
-    @Override
-    protected void onSaveInstanceState(final Bundle outState) {
-        if(mProductList != null) {
-            outState.putParcelableArray(PRODUCTS_INSTANCE_STATE_KEY, mProductList.toArray(new Product[mProductList.size()]));
-        }
-        if(mReceiptList != null) {
-            outState.putParcelableArray(RECEIPTS_INSTANCE_STATE_KEY, mReceiptList.toArray(new Receipt[mReceiptList.size()]));
         }
     }
 
@@ -355,14 +258,52 @@ public class IapSampleActivity extends Activity {
         }
     }
 
+    private synchronized void requestLogin() {
+        if (sEnableLogging) {
+            Log.d(LOG_TAG, "requestLogin:");
+        }
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                mStoreFacade.requestLogin(IapSampleActivity.this, new ResponseListener<Void>() {
+                    @Override
+                    public void onSuccess(Void result) {
+                        if (sEnableLogging) {
+                            Log.d(LOG_TAG, "requestLogin listener: onSuccess");
+                        }
+                        Toast.makeText(IapSampleActivity.this, "requestLogin listener: onSuccess", Toast.LENGTH_LONG).show();
+                        // Request an up to date list of receipts for the user.
+                        requestReceipts();
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMessage, Bundle bundle) {
+                        Log.e(LOG_TAG, "requestLogin listener: onFailure errorCode="+errorCode+" errorMessage="+errorMessage);
+                        Toast.makeText(IapSampleActivity.this, "requestLogin listener: onFailure errorCode=" + errorCode + " errorMessage=" + errorMessage, Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        Log.e(LOG_TAG, "requestLogin listener: onCancel");
+                        Toast.makeText(IapSampleActivity.this, "requestLogin listener: onCancel", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        };
+
+        runOnUiThread(runnable);
+    }
+
     /**
      * Get the list of products the user can purchase from the server.
      */
     public synchronized void requestProducts() {
         Log.d(LOG_TAG, "Requesting products");
-        mStoreFacade.requestProductList(this, ALL_PRODUCT_IDENTIFIERS, new CancelIgnoringResponseListener<List<Product>>() {
+        mStoreFacade.requestProductList(this, ALL_PRODUCT_IDENTIFIERS, new ResponseListener<List<Product>>() {
             @Override
             public void onSuccess(final List<Product> products) {
+                Toast.makeText(IapSampleActivity.this, "requestProducts listener: onSuccess!", Toast.LENGTH_LONG).show();
                 mProductList = products;
                 addProducts();
             }
@@ -372,17 +313,27 @@ public class IapSampleActivity extends Activity {
                 // Your app probably wants to do something more sophisticated than popping a Toast. This is
                 // here to tell you that your app needs to handle this case: if your app doesn't display
                 // something, the user won't know of the failure.
-                Toast.makeText(IapSampleActivity.this, "Could not fetch product information (error " + errorCode + ": " + errorMessage + ")", Toast.LENGTH_LONG).show();
+                Toast.makeText(IapSampleActivity.this, "requestProducts listener: onFailure errorCode=" + errorCode + " errorMessage=" + errorMessage, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onCancel() {
+                Toast.makeText(IapSampleActivity.this, "requestProducts listener: onCancel!", Toast.LENGTH_LONG).show();
             }
         });
     }
 
-    private synchronized void fetchGamerInfo() {
-        Log.d(LOG_TAG, "Requesting gamerinfo");
-        mStoreFacade.requestGamerInfo(this, new CancelIgnoringResponseListener<GamerInfo>() {
+    private synchronized void requestGamerInfo() {
+        if (sEnableLogging) {
+            Log.d(LOG_TAG, "requestGamerinfo:");
+        }
+        mStoreFacade.requestGamerInfo(this, new ResponseListener<GamerInfo>() {
             @Override
             public void onSuccess(GamerInfo result) {
-                Log.d(LOG_TAG, "requestGamerInfo onSuccess");
+                if (sEnableLogging) {
+                    Log.d(LOG_TAG, "requestGamerInfo onSuccess");
+                }
+                Toast.makeText(IapSampleActivity.this, "requestGamerInfo listener: onSuccess!", Toast.LENGTH_LONG).show();
                 new AlertDialog.Builder(IapSampleActivity.this)
                         .setTitle(getString(R.string.alert_title))
                         .setMessage(getResources().getString(R.string.userinfo, result.getUsername(), result.getUuid()))
@@ -392,34 +343,16 @@ public class IapSampleActivity extends Activity {
 
             @Override
             public void onFailure(int errorCode, String errorMessage, Bundle optionalData) {
-                Log.w(LOG_TAG, "fetch gamer UUID error (code " + errorCode + ": " + errorMessage + ")");
-                boolean wasHandledByAuthHelper =
-                        AuthenticationHelper.
-                                handleError(
-                                        IapSampleActivity.this, errorCode, errorMessage,
-                                        optionalData, GAMER_UUID_AUTHENTICATION_ACTIVITY_ID,
-                                        new ResponseListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void result) {
-                                                fetchGamerInfo();   // Retry the fetch if the error was handled.
-                                            }
+                Log.e(LOG_TAG, "requestGamerInfo listener: onFailure errorCode="+errorCode+" errorMessage="+errorMessage);
+                Toast.makeText(IapSampleActivity.this, "requestGamerInfo listener: onFailure errorCode="+errorCode+" errorMessage="+errorMessage, Toast.LENGTH_LONG).show();
+                requestLogin();
+            }
 
-                                            @Override
-                                            public void onFailure(int errorCode, String errorMessage,
-                                                                  Bundle optionalData) {
-                                                showError("Unable to fetch gamer UUID (error " +
-                                                        errorCode + ": " + errorMessage + ")");
-                                            }
-
-                                            @Override
-                                            public void onCancel() {
-                                                showError("Unable to fetch gamer UUID");
-                                            }
-                                        });
-
-                if (!wasHandledByAuthHelper) {
-                    showError("Unable to fetch gamer UUID (error " + errorCode + ": " + errorMessage + ")");
-                }
+            @Override
+            public void onCancel() {
+                Log.e(LOG_TAG, "requestGamerInfo listener: onCancel");
+                Toast.makeText(IapSampleActivity.this, "requestGamerInfo listener: onCancel!", Toast.LENGTH_LONG).show();
+                requestLogin();
             }
         });
     }
@@ -427,7 +360,6 @@ public class IapSampleActivity extends Activity {
     /**
      * Request the receipts from the users previous purchases from the server.
      */
-
     private synchronized void requestReceipts() {
         Log.d(LOG_TAG, "Requesting receipts");
         mStoreFacade.requestReceipts(this, new ReceiptListener());
@@ -436,7 +368,6 @@ public class IapSampleActivity extends Activity {
     /**
      * Add all of the products for this application to the UI as buttons for the user to click.
      */
-
     private void addProducts() {
         if(mProductList != null) {
             ViewGroup viewGroup = (ViewGroup)findViewById(R.id.products);
@@ -450,7 +381,6 @@ public class IapSampleActivity extends Activity {
     /**
      * Change the Adapter on the receipt ListView to show the currently known receipts.
      */
-
     private void addReceipts() {
         if(mReceiptList != null) {
             mReceiptListView.setAdapter(
@@ -490,14 +420,11 @@ public class IapSampleActivity extends Activity {
      */
     public void requestPurchase(final Product product)
             throws GeneralSecurityException, UnsupportedEncodingException, JSONException {
-
         Purchasable purchasable = product.createPurchasable();
-        String orderId = purchasable.getOrderId();
-
-        synchronized (mOutstandingPurchaseRequests) {
-            mOutstandingPurchaseRequests.put(orderId, product);
+        if (sEnableLogging) {
+            Log.d(LOG_TAG, "requestPurchase: identifier="+purchasable.getProductId());
         }
-        mStoreFacade.requestPurchase(this, purchasable, new PurchaseListener(product));
+        mStoreFacade.requestPurchase(this, purchasable, new PurchaseListener());
     }
 
     @Override
@@ -541,6 +468,7 @@ public class IapSampleActivity extends Activity {
      */
 
     private void showError(final String errorMessage) {
+        Log.e(LOG_TAG, "showError: errorMessage="+errorMessage);
         Toast.makeText(IapSampleActivity.this, errorMessage, Toast.LENGTH_LONG).show();
     }
 
@@ -556,6 +484,7 @@ public class IapSampleActivity extends Activity {
          */
         @Override
         public void onSuccess(Collection<Receipt> receipts) {
+            Toast.makeText(IapSampleActivity.this, "requestReceipts listener: onSuccess", Toast.LENGTH_LONG).show();
             mReceiptList = new ArrayList<Receipt>(receipts);
             IapSampleActivity.this.runOnUiThread(new Runnable() {
                 @Override
@@ -579,8 +508,8 @@ public class IapSampleActivity extends Activity {
 
         @Override
         public void onFailure(int errorCode, String errorMessage, Bundle optionalData) {
-            Log.w(LOG_TAG, "Request Receipts error (code " + errorCode + ": " + errorMessage + ")");
-            showError("Could not fetch receipts (error " + errorCode + ": " + errorMessage + ")");
+            Toast.makeText(IapSampleActivity.this, "requestReceipts listener: onFailure errorCode="+errorCode+" errorMessage="+errorMessage, Toast.LENGTH_LONG).show();
+            showError("requestReceipts listener: onFailure errorCode="+errorCode+" errorMessage="+errorMessage);
         }
 
         /*
@@ -589,13 +518,14 @@ public class IapSampleActivity extends Activity {
         @Override
         public void onCancel()
         {
+            Toast.makeText(IapSampleActivity.this, "requestReceipts listener: onCancel", Toast.LENGTH_LONG).show();
             showError("User cancelled getting receipts");
         }
     }
 
     /**
-     * The callback for when the user attempts to purchase something. We're not worried about
-     * the user cancelling the purchase so we extend CancelIgnoringResponseListener, if
+     * The callback for when the user attempts to purchase something. If you're not worried about
+     * the user cancelling the purchase, extend CancelIgnoringResponseListener, if
      * you want to handle cancelations differently you should extend ResponseListener and
      * implement an onCancel method.
      *
@@ -603,20 +533,6 @@ public class IapSampleActivity extends Activity {
      * @see com.razerzone.store.sdk.ResponseListener#onCancel()
      */
     private class PurchaseListener implements ResponseListener<PurchaseResult> {
-        /**
-         * The ID of the product the user is trying to purchase. This is used in the
-         * onFailure method to start a re-purchase if they user wishes to do so.
-         */
-
-        private Product mProduct;
-
-        /**
-         * Constructor. Store the ID of the product being purchased.
-         */
-
-        PurchaseListener(final Product product) {
-            mProduct = product;
-        }
 
         /**
          * Handle a successful purchase.
@@ -625,36 +541,22 @@ public class IapSampleActivity extends Activity {
          */
         @Override
         public void onSuccess(PurchaseResult result) {
-
-            Product storedProduct;
-            synchronized (mOutstandingPurchaseRequests) {
-                storedProduct = mOutstandingPurchaseRequests.remove(result.getOrderId());
-            }
-
-            // If the cached product doesn't have the same ProductID that was actually purchased OR
-            // If the cached product doesn't have the same ProductID that we wanted to be purchased
-            // Then error out
-            if (storedProduct == null ||
-                    !storedProduct.getIdentifier().equals(result.getProductIdentifier()) ||
-                    !storedProduct.getIdentifier().equals(mProduct.getIdentifier())) {
-                onFailure(ErrorCodes.THROW_DURING_ON_SUCCESS, "Purchased product is not the same as purchase request product", Bundle.EMPTY);
-                return;
-            }
-
-            Toast.makeText(IapSampleActivity.this, "Purchase successful", Toast.LENGTH_LONG).show();
+            Toast.makeText(IapSampleActivity.this, "requestPurchase listener: onSuccess identifier="+result.getProductIdentifier(), Toast.LENGTH_LONG).show();
             requestReceipts();
         }
 
         @Override
         public void onFailure(int errorCode, String errorMessage, Bundle optionalData) {
-            Toast.makeText(IapSampleActivity.this, "Purchase failed (error " + errorCode + ": " + errorMessage + ")", Toast.LENGTH_LONG).show();
+            Toast.makeText(IapSampleActivity.this, "requestPurchase listener: onFailure errorCode="+errorCode+" errorMessage="+errorMessage, Toast.LENGTH_LONG).show();
         }
 
         /*
          * Handling the user canceling
          */
         @Override
-        public void onCancel() {
+        public void onCancel()
+        {
+            Toast.makeText(IapSampleActivity.this, "requestPurchase listener: onCancel", Toast.LENGTH_LONG).show();
             showError("User cancelled purchase");
         }
     }

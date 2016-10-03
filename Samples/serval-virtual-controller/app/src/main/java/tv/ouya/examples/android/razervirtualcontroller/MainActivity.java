@@ -15,7 +15,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import tv.ouya.sdk.*;
+
+import com.razerzone.store.sdk.engine.java.DebugInput;
+import com.razerzone.store.sdk.engine.java.RazerController;
 
 public class MainActivity extends Activity {
 
