@@ -147,9 +147,9 @@ public class IapSampleActivity extends Activity {
 
         mStoreFacade = StoreFacade.getInstance();
 
-        mShutdownListener = new CancelIgnoringResponseListener() {
+        mShutdownListener = new CancelIgnoringResponseListener<Void>() {
             @Override
-            public void onSuccess(Object o) {
+            public void onSuccess(Void result) {
                 Log.d(LOG_TAG, "ShutdownListener onSuccess: finishing activity...");
                 finish();
             }
@@ -187,6 +187,22 @@ public class IapSampleActivity extends Activity {
             @Override
             public void onClick(View view) {
                 requestLogin();
+            }
+        });
+
+        Button btnProducts = (Button) findViewById(R.id.products_button);
+        btnProducts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requestProducts();
+            }
+        });
+
+        Button btnReceipts = (Button) findViewById(R.id.receipts_button);
+        btnReceipts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requestReceipts();
             }
         });
 
